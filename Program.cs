@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace TugasBesar
 {
@@ -19,8 +20,9 @@ namespace TugasBesar
                 Console.WriteLine("\t\t[2] Edit Barang");
                 Console.WriteLine("\t\t[3] Hapus Barang");
                 Console.WriteLine("\t\t[4] Cari Barang");
-                Console.WriteLine("\t\t[5] Lihat Semua Barang");
-                Console.WriteLine("\t\t[6] Keluar");
+                Console.WriteLine("\t\t[5] Sorting Barang");
+                Console.WriteLine("\t\t[6] Lihat Semua Barang");
+                Console.WriteLine("\t\t[7] Keluar");
                 Console.Write("\t\tMasukan pilihan: ");
                 pilihMenu = int.Parse(Console.ReadLine());
 
@@ -39,9 +41,12 @@ namespace TugasBesar
                         CariDanFilterBarang();
                         break;
                     case 5:
-                        TampilkanBarang();
+                        SortingBarang();
                         break;
                     case 6:
+                        TampilkanBarang();
+                        break;
+                    case 7:
                         Console.WriteLine("Keluar dari program...");
                         break;
                     default:
@@ -49,12 +54,12 @@ namespace TugasBesar
                         break;
                 }
 
-                if (pilihMenu != 6)
+                if (pilihMenu != 7)
                 {
                     Console.WriteLine("Tekan Enter untuk kembali ke menu utama...");
                     Console.ReadLine();
                 }
-            } while (pilihMenu != 6);
+            } while (pilihMenu != 7);
         }
 
         static void TambahBarang()
@@ -73,11 +78,42 @@ namespace TugasBesar
             Console.Write("Masukkan Merk Barang: ");
             barangBaru.MerkBarang = Console.ReadLine();
 
-            Console.Write("Masukkan Harga Barang: ");
-            barangBaru.HargaBarang = decimal.Parse(Console.ReadLine());
+            while (true)
+            {
+               Console.Write("Masukkan Harga Barang: ");
+               string inputHarga = Console.ReadLine();
+                try
+                {
+                    int hargaBaru = int.Parse(inputHarga);
+                    if (hargaBaru == barangBaru.HargaBarang)
+                    {
+                    Console.WriteLine("Harga masih sama, masukkan harga terbaru");
+                    continue;
+                    }
+                    barangBaru.HargaBarang = hargaBaru;
+                    break; 
+                }
+                catch  (FormatException)
+                {
+                    Console.WriteLine("Input yang dimasukkan tidak sesuai, silahkan masukkan angka yang benar");
+                }
 
-            Console.Write("Masukkan Stok Barang: ");
-            barangBaru.Stok = int.Parse(Console.ReadLine());
+            }
+
+            while (true)
+            {
+                Console.Write("Masukkan Stok Barang: ");
+                string inputStok = Console.ReadLine();
+                try
+                {
+                   barangBaru.Stok = int.Parse(inputStok);
+                   break;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Input yang dimasukkan tidak sesuai, silahkan masukkan angka yang benar");
+                }
+            }
 
             daftarBarang[jumlahBarang] = barangBaru;
             jumlahBarang++;
@@ -102,15 +138,56 @@ namespace TugasBesar
 
                     if (pilihan == 1)
                     {
-                        Console.Write("Masukkan Harga Baru Barang: ");
-                        daftarBarang[i].HargaBarang = decimal.Parse(Console.ReadLine());
-                        Console.WriteLine("Harga berhasil diperbarui");
+                        while (true)
+                        {
+                            Console.WriteLine("Masukkan Harga Baru");
+                            string inputHarga = Console.ReadLine();
+                            try
+                            {
+                               int hargaBaru = int.Parse(inputHarga);
+                               if (hargaBaru == daftarBarang[i].HargaBarang)
+                               {
+                                Console.WriteLine("Harga masih sama, masukkan harga terbaru");
+                                continue;
+                               }
+                               daftarBarang[i].HargaBarang = hargaBaru;
+                               Console.WriteLine("Harga berhasil diubah");
+                               break;
+                            }
+                            catch (FormatException)
+                            {
+                                Console.WriteLine("Input yang dimasukkan tidak sesuai, silahkan masukkan angka yang benar");
+                            }
+                            catch (OverflowException)
+                            {
+                                Console.WriteLine("Harga masih sama, masukkan harga terbaru");
+                            }
+                        }
+                       
                     }
                     else if (pilihan == 2)
                     {
-                        Console.Write("Masukkan Stok Baru Barang: ");
-                        daftarBarang[i].Stok = int.Parse(Console.ReadLine());
-                        Console.WriteLine("Stok berhasil diperbarui");
+                        while (true)
+                        {
+                           Console.WriteLine("Masukkan stok terbaru");
+                           string inputStok = Console.ReadLine();
+                           try
+                           {
+                            int stokBaru = int.Parse(inputStok);
+                            if (stokBaru == daftarBarang[i].Stok)
+                            {
+                                Console.WriteLine("Stok masih sama, masukkan stok terbaru");
+                                continue;
+                            }
+                            daftarBarang[i].Stok = int.Parse(inputStok);
+                            Console.WriteLine("Stok berhasil diperbarui");
+                            break;
+                           }
+                            catch (FormatException)
+                            {
+                                Console.WriteLine("Input tidak sesuai, silahkan masukkan angka yang benar");
+                            }
+                        }
                     }
                     else
                     {
@@ -149,107 +226,167 @@ namespace TugasBesar
             Console.WriteLine("Barang dengan merk tersebut tidak ditemukan.");
         }
 
-       static void CariDanFilterBarang()
-{
-    Console.WriteLine("Pilih Pencarian Berdasarkan:");
-    Console.WriteLine("1. Berdasarkan Jenis Barang");
-    Console.WriteLine("2. Berdasarkan Batas Harga");
-    Console.Write("Masukkan pilihan: ");
-    int pilihan = int.Parse(Console.ReadLine());
-
-    if (pilihan == 1)
+    static void CariDanFilterBarang()
     {
-        Console.Write("Masukkan jenis barang yang ingin dicari: ");
-        string keyword = Console.ReadLine();
+        Console.WriteLine("Pilih Pencarian Berdasarkan:");
+        Console.WriteLine("1. Berdasarkan Jenis Barang");
+        Console.WriteLine("2. Berdasarkan Batas Harga");
+        Console.Write("Masukkan pilihan: ");
+        int pilihan = int.Parse(Console.ReadLine());
 
-        bool found = false;
-        Barang[] filteredBarang = new Barang[jumlahBarang];
-        int countFiltered = 0;
-
-        for (int i = 0; i < jumlahBarang; i++)
+        if (pilihan == 1)
         {
-            if (daftarBarang[i].JenisBarang.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+            Console.Write("Masukkan jenis barang yang ingin dicari: ");
+            string keyword = Console.ReadLine();
+
+            bool found = false;
+            Barang[] filteredBarang = new Barang[jumlahBarang];
+            int countFiltered = 0;
+
+            for (int i = 0; i < jumlahBarang; i++)
             {
-                filteredBarang[countFiltered++] = daftarBarang[i];
-                found = true;
-            }
-        }
-
-        if (!found)
-        {
-            Console.WriteLine("Barang tidak ditemukan.");
-            return;
-        }
-
-        // Bubble Sort berdasarkan HargaBarang
-        for (int i = 0; i < countFiltered - 1; i++)
-        {
-            for (int j = 0; j < countFiltered - i - 1; j++)
-            {
-                if (filteredBarang[j].HargaBarang > filteredBarang[j + 1].HargaBarang)
+                if (daftarBarang[i].JenisBarang.Contains(keyword, StringComparison.OrdinalIgnoreCase))
                 {
-                    Barang temp = filteredBarang[j];
-                    filteredBarang[j] = filteredBarang[j + 1];
-                    filteredBarang[j + 1] = temp;
+                    filteredBarang[countFiltered++] = daftarBarang[i];
+                    found = true;
                 }
             }
-        }
 
-        Console.WriteLine("Barang yang ditemukan setelah diurutkan berdasarkan harga:");
-        for (int i = 0; i < countFiltered; i++)
-        {
-            TampilkanDetailBarang(filteredBarang[i]);
-        }
-    }
-    else if (pilihan == 2)
-    {
-        Console.Write("Masukkan batas harga maksimum: ");
-        decimal maxPrice = decimal.Parse(Console.ReadLine());
-
-        Barang[] filteredBarang = new Barang[jumlahBarang];
-        int countFiltered = 0;
-
-        for (int i = 0; i < jumlahBarang; i++)
-        {
-            if (daftarBarang[i].HargaBarang <= maxPrice)
+            if (!found)
             {
-                filteredBarang[countFiltered++] = daftarBarang[i];
+                Console.WriteLine("Barang tidak ditemukan.");
+                return;
             }
-        }
 
-        if (countFiltered == 0)
-        {
-            Console.WriteLine("Tidak ada barang yang sesuai dengan filter.");
-            return;
-        }
-
-        for (int i = 0; i < countFiltered - 1; i++)
-        {
-            for (int j = 0; j < countFiltered - i - 1; j++)
+            //bubble sort
+            for (int i = 0; i < countFiltered - 1; i++)
             {
-                if (filteredBarang[j].HargaBarang > filteredBarang[j + 1].HargaBarang)
+                for (int j = 0; j < countFiltered - i - 1; j++)
                 {
-                    Barang temp = filteredBarang[j];
-                    filteredBarang[j] = filteredBarang[j + 1];
-                    filteredBarang[j + 1] = temp;
+                    if (filteredBarang[j].HargaBarang > filteredBarang[j + 1].HargaBarang)
+                    {
+                        Barang temp = filteredBarang[j];
+                        filteredBarang[j] = filteredBarang[j + 1];
+                        filteredBarang[j + 1] = temp;
+                    }
                 }
             }
-        }
 
-        Console.WriteLine("Barang setelah difilter dan diurutkan berdasarkan harga:");
-        for (int i = 0; i < countFiltered; i++)
+            Console.WriteLine("Barang yang ditemukan setelah diurutkan berdasarkan harga:");
+            for (int i = 0; i < countFiltered; i++)
+            {
+                TampilkanDetailBarang(filteredBarang[i]);
+            }
+        }
+        else if (pilihan == 2)
         {
-            TampilkanDetailBarang(filteredBarang[i]);
+            while (true)
+            {
+            Console.Write("Masukkan batas harga maksimum: ");
+            string inputMaxPrice = Console.ReadLine();
+            try
+            {
+                int maxPrice = int.Parse(inputMaxPrice);
+                Barang[] filteredBarang = new Barang[jumlahBarang];
+                int countFiltered = 0;
+
+                for (int i = 0; i < jumlahBarang; i++)
+                {
+                    if (daftarBarang[i].HargaBarang <= maxPrice)
+                    {
+                        filteredBarang[countFiltered++] = daftarBarang[i];
+                    }
+                }
+
+                if (countFiltered == 0)
+                {
+                    Console.WriteLine("Tidak ada barang yang sesuai dengan filter.");
+                    return;
+            }
+
+            for (int i = 0; i < countFiltered - 1; i++)
+            {
+                for (int j = 0; j < countFiltered - i - 1; j++)
+                {
+                    if (filteredBarang[j].HargaBarang > filteredBarang[j + 1].HargaBarang)
+                    {
+                        Barang temp = filteredBarang[j];
+                        filteredBarang[j] = filteredBarang[j + 1];
+                        filteredBarang[j + 1] = temp;
+                    }
+                }
+            }
+
+            Console.WriteLine("Barang setelah difilter dan diurutkan berdasarkan harga:");
+            for (int i = 0; i < countFiltered; i++)
+            {
+                TampilkanDetailBarang(filteredBarang[i]);
+            }
+            break;
+            }
+        
+        catch (FormatException)
+        {
+            Console.WriteLine("Input tidak benar, harap masukkan angka yang benar");
         }
     }
-    else
-    {
-        Console.WriteLine("Pilihan tidak valid.");
+ }
+        
+        else
+        {
+            Console.WriteLine("Pilihan tidak valid.");
+        }
     }
-}
+
+    static void SortingBarang()
+    {
+        if (jumlahBarang == 0)
+        {
+            Console.WriteLine("Tidak ada barang yang dapat diurutkan");
+            return;
+        }
+        Console.WriteLine("Pilih cara pengurutan:");
+        Console.WriteLine("1. Urutkan dari harga terendah");
+        Console.WriteLine("2. Urutkan dari harga tertinggi");
+        Console.WriteLine("Masukkan pilihan: ");
+
+        int pilihan = int.Parse(Console.ReadLine());
+
+            for (int i = 0; i < jumlahBarang - 1; i++)
+            {
+                for(int j = 0; j < jumlahBarang -  i - 1; j++)
+                {
+                    bool swapCondition = false;
+                    
+                    if (pilihan == 1)
+                    {
+                        swapCondition = daftarBarang[j].HargaBarang > daftarBarang[j + 1].HargaBarang;
+                    }
+                    else if (pilihan == 2)
+                    {
+                        swapCondition = daftarBarang[j].HargaBarang < daftarBarang[j + 1].HargaBarang;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Pilihan salah");
+                        return;
+                    }
+                    
+                    if (swapCondition)
+                    {
+                        Barang temp = daftarBarang[j];
+                        daftarBarang[j] = daftarBarang[j + 1];
+                        daftarBarang[j + 1] = temp;
+                    }
+                }
+            }
+
+            Console.WriteLine("Barang berhasil diurutkan");
+            TampilkanBarang();
+    }
 
 
-        static void TampilkanBarang()
+    static void TampilkanBarang()
         {
             if (jumlahBarang == 0)
             {
@@ -277,7 +414,7 @@ namespace TugasBesar
     {
         public string JenisBarang { get; set; }
         public string MerkBarang { get; set; }
-        public decimal HargaBarang { get; set; }
+        public int HargaBarang { get; set; }
         public int Stok { get; set; }
     }
 }
